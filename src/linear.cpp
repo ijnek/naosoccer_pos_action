@@ -14,11 +14,11 @@ public:
     {
         this->declare_parameter<std::string>("file", getDefaultFullFilePath());
 
-        pub = create_publisher<nao_interfaces::msg::Joints>("/effectors/joints", 1);
+        pub = create_publisher<nao_interfaces::msg::Joints>("effectors/joints", 1);
 
         sub_joint_states =
             create_subscription<nao_interfaces::msg::Joints>(
-                "/sensors/joints", 1,
+                "sensors/joints", 1,
                 [this](nao_interfaces::msg::Joints::SharedPtr sensor_joints) {
                     if (posInAction)
                     {
@@ -28,7 +28,7 @@ public:
 
         sub_start =
             create_subscription<std_msgs::msg::Bool>(
-                "/start_pos_action", 1,
+                "start_pos_action", 1,
                 [this](std_msgs::msg::Bool::UniquePtr start_pos_action) {
                     if (start_pos_action->data && fileSuccessfullyRead && !posInAction)
                     {
