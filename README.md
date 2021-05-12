@@ -1,4 +1,9 @@
+## NOTE: THIS PACKAGE IS UNDER HEAVY DEVELOPMENT AND NOT READY FOR USE
+
+
 # naosoccer_pos_action
+
+[![CI](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/main.yml/badge.svg)](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/main.yml)
 
 Executes a .pos file action for a NAO robot, a filetype defined in rUNSWift's codebase.
 
