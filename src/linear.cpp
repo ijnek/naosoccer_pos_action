@@ -59,7 +59,7 @@ public:
     std::string filePath;
     this->get_parameter("file", filePath);
     fileSuccessfullyRead = initialiseKeyFrameVector(filePath);
-    RCLCPP_DEBUG(this->get_logger(), "Pos file succesfully loaded from " + filePath);
+    RCLCPP_DEBUG(this->get_logger(), ("Pos file succesfully loaded from " + filePath).c_str());
   }
 
 private:
@@ -90,7 +90,7 @@ private:
       std::getline(in, line);
 
       if (line.front() == '!') {
-        RCLCPP_DEBUG(this->get_logger(), "Found joint line: " + line);
+        RCLCPP_DEBUG(this->get_logger(), ("Found joint line: " + line).c_str());
         line.erase(line.begin());
 
         std::istringstream ss(line);
@@ -116,8 +116,8 @@ private:
           } catch (std::invalid_argument &) {
             RCLCPP_ERROR(
               this->get_logger(),
-              "joint value '" + position_deg_string +
-              "' is not a valid joint value (cannot be converted to float)");
+              ("joint value '" + position_deg_string +
+              "' is not a valid joint value (cannot be converted to float)").c_str());
             return false;
           }
         }
@@ -129,8 +129,8 @@ private:
         } catch (std::invalid_argument &) {
           RCLCPP_ERROR(
             this->get_logger(),
-            "duration '" + duration_string +
-            "' is not a valid duration value (cannot be converted to int)");
+            ("duration '" + duration_string +
+            "' is not a valid duration value (cannot be converted to int)").c_str());
           return false;
         }
 
@@ -157,7 +157,7 @@ private:
       firstTickSinceActionStarted = false;
     }
 
-    RCLCPP_DEBUG(this->get_logger(), "time_ms is: " + std::to_string(time_ms));
+    RCLCPP_DEBUG(this->get_logger(), ("time_ms is: " + std::to_string(time_ms)).c_str());
 
     std::pair<nao_interfaces::msg::Joints, int> & previousKeyFrame = findPreviousKeyFrame(time_ms);
     std::pair<nao_interfaces::msg::Joints, int> & nextKeyFrame = findNextKeyFrame(time_ms);
@@ -167,16 +167,16 @@ private:
     float duration = timeFromPreviousKeyFrame + timeToNextKeyFrame;
 
     RCLCPP_DEBUG(
-      this->get_logger(), "timeFromPreviousKeyFrame, timeFromPreviousKeyFrame, duration: " +
+      this->get_logger(), ("timeFromPreviousKeyFrame, timeFromPreviousKeyFrame, duration: " +
       std::to_string(timeFromPreviousKeyFrame) + ", " + std::to_string(timeToNextKeyFrame) + ", " +
-      std::to_string(duration));
+      std::to_string(duration)).c_str());
 
     float alpha = timeToNextKeyFrame / duration;
     float beta = timeFromPreviousKeyFrame / duration;
 
     RCLCPP_DEBUG(
-      this->get_logger(), "alpha, beta: " + std::to_string(alpha) + ", " + std::to_string(
-        beta));
+      this->get_logger(), ("alpha, beta: " + std::to_string(alpha) + ", " + std::to_string(
+        beta)).c_str());
 
     nao_interfaces::msg::Joints effector_joints;
 
@@ -186,9 +186,9 @@ private:
       effector_joints.angles[i] = previous * alpha + next * beta;
 
       RCLCPP_DEBUG(
-        this->get_logger(), "previous, next, result: " + std::to_string(
+        this->get_logger(), ("previous, next, result: " + std::to_string(
           previous) + ", " + std::to_string(next) + ", " +
-        std::to_string(effector_joints.angles[i]));
+        std::to_string(effector_joints.angles[i])).c_str());
     }
 
     pub->publish(effector_joints);
