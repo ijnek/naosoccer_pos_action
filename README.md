@@ -13,4 +13,8 @@ Executes a .pos file action for a NAO robot, a filetype defined in rUNSWift's co
   
     `ros2 topic pub --once start_pos_action std_msgs/msg/Bool '{data: true}'`
 
-Pos file can be specified using rosargs in step 3.
+Pos file can be specified using rosargs in step 3, such as:
+
+```
+ros2 run naosoccer_pos_action linear --ros-args -p "file:=src/naosoccer_pos_action/pos/tilt.pos"
+```
