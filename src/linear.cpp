@@ -18,12 +18,41 @@
 #include <memory>
 #include "rclcpp/rclcpp.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
-#include "nao_interfaces/msg/joints.hpp"
+#include "nao_sensor_msgs/msg/joint_positions.hpp"
+#include "nao_command_msgs/msg/joint_positions.hpp"
+#include "nao_command_msgs/msg/joint_indexes.hpp"
 #include "std_msgs/msg/bool.hpp"
 #include "boost/filesystem.hpp"
 #include "rclcpp/time.hpp"
 
 namespace fs = boost::filesystem;
+
+std::vector<uint8_t> indexes = {
+  nao_command_msgs::msg::JointIndexes::HEADYAW,
+  nao_command_msgs::msg::JointIndexes::HEADPITCH,
+  nao_command_msgs::msg::JointIndexes::LSHOULDERPITCH,
+  nao_command_msgs::msg::JointIndexes::LSHOULDERROLL,
+  nao_command_msgs::msg::JointIndexes::LELBOWYAW,
+  nao_command_msgs::msg::JointIndexes::LELBOWROLL,
+  nao_command_msgs::msg::JointIndexes::LWRISTYAW,
+  nao_command_msgs::msg::JointIndexes::LHIPYAWPITCH,
+  nao_command_msgs::msg::JointIndexes::LHIPROLL,
+  nao_command_msgs::msg::JointIndexes::LHIPPITCH,
+  nao_command_msgs::msg::JointIndexes::LKNEEPITCH,
+  nao_command_msgs::msg::JointIndexes::LANKLEPITCH,
+  nao_command_msgs::msg::JointIndexes::LANKLEROLL,
+  nao_command_msgs::msg::JointIndexes::RHIPROLL,
+  nao_command_msgs::msg::JointIndexes::RHIPPITCH,
+  nao_command_msgs::msg::JointIndexes::RKNEEPITCH,
+  nao_command_msgs::msg::JointIndexes::RANKLEPITCH,
+  nao_command_msgs::msg::JointIndexes::RANKLEROLL,
+  nao_command_msgs::msg::JointIndexes::RSHOULDERPITCH,
+  nao_command_msgs::msg::JointIndexes::RSHOULDERROLL,
+  nao_command_msgs::msg::JointIndexes::RELBOWYAW,
+  nao_command_msgs::msg::JointIndexes::RELBOWROLL,
+  nao_command_msgs::msg::JointIndexes::RWRISTYAW,
+  nao_command_msgs::msg::JointIndexes::LHAND,
+  nao_command_msgs::msg::JointIndexes::RHAND};
 
 class Linear : public rclcpp::Node
 {
@@ -33,12 +62,12 @@ public:
   {
     this->declare_parameter<std::string>("file", getDefaultFullFilePath());
 
-    pub = create_publisher<nao_interfaces::msg::Joints>("effectors/joints", 1);
+    pub = create_publisher<nao_command_msgs::msg::JointPositions>("effectors/joint_positions", 1);
 
     sub_joint_states =
-      create_subscription<nao_interfaces::msg::Joints>(
-      "sensors/joints", 1,
-      [this](nao_interfaces::msg::Joints::SharedPtr sensor_joints) {
+      create_subscription<nao_sensor_msgs::msg::JointPositions>(
+      "sensors/joint_positions", 1,
+      [this](nao_sensor_msgs::msg::JointPositions::SharedPtr sensor_joints) {
         if (posInAction) {
           calculate_effector_joints(*sensor_joints);
         }
@@ -98,21 +127,22 @@ private:
         std::vector<std::string> splitted_line(std::istream_iterator<std::string>{ss},
           std::istream_iterator<std::string>());
 
-        if (splitted_line.size() != nao_interfaces::msg::Joints::NUMJOINTS + 1) {
+        if (splitted_line.size() != nao_command_msgs::msg::JointIndexes::NUMJOINTS + 1) {
           // +1 because there is the duration component as well
           RCLCPP_ERROR(this->get_logger(), "pos file joint line missing joint values or duration!");
           return false;
         }
 
-        nao_interfaces::msg::Joints newJoint;
+        nao_command_msgs::msg::JointPositions newJoint;
+        newJoint.indexes = indexes;
 
-        for (unsigned int i = 0; i < nao_interfaces::msg::Joints::NUMJOINTS; ++i) {
-          std::string position_deg_string = splitted_line[i];
+        for (unsigned int i = 0; i < nao_command_msgs::msg::JointIndexes::NUMJOINTS; ++i) {
+          std::string position_deg_string = splitted_line.at(i);
 
           try {
             float position_deg = std::stof(position_deg_string);
             float position_rad = position_deg * M_PI / 180;
-            newJoint.angles.at(i) = position_rad;
+            newJoint.positions.push_back(position_rad);
           } catch (std::invalid_argument &) {
             RCLCPP_ERROR(
               this->get_logger(),
@@ -141,7 +171,7 @@ private:
     return true;
   }
 
-  void calculate_effector_joints(nao_interfaces::msg::Joints & sensor_joints)
+  void calculate_effector_joints(nao_sensor_msgs::msg::JointPositions & sensor_joints)
   {
     int time_ms = (rclcpp::Node::now() - begin).nanoseconds() / 1e6;
 
@@ -153,14 +183,20 @@ private:
     }
 
     if (firstTickSinceActionStarted) {
-      jointsWhenActionStarted = std::make_pair(sensor_joints, 0);
+      nao_command_msgs::msg::JointPositions command;
+      command.indexes = indexes;
+      command.positions = std::vector<float>(
+        sensor_joints.positions.begin(), sensor_joints.positions.end());
+      jointsWhenActionStarted = std::make_pair(command, 0);
       firstTickSinceActionStarted = false;
     }
 
     RCLCPP_DEBUG(this->get_logger(), ("time_ms is: " + std::to_string(time_ms)).c_str());
 
-    std::pair<nao_interfaces::msg::Joints, int> & previousKeyFrame = findPreviousKeyFrame(time_ms);
-    std::pair<nao_interfaces::msg::Joints, int> & nextKeyFrame = findNextKeyFrame(time_ms);
+    std::pair<nao_command_msgs::msg::JointPositions, int> & previousKeyFrame = findPreviousKeyFrame(
+      time_ms);
+    std::pair<nao_command_msgs::msg::JointPositions,
+      int> & nextKeyFrame = findNextKeyFrame(time_ms);
 
     float timeFromPreviousKeyFrame = time_ms - previousKeyFrame.second;
     float timeToNextKeyFrame = nextKeyFrame.second - time_ms;
@@ -178,23 +214,24 @@ private:
       this->get_logger(), ("alpha, beta: " + std::to_string(alpha) + ", " + std::to_string(
         beta)).c_str());
 
-    nao_interfaces::msg::Joints effector_joints;
+    nao_command_msgs::msg::JointPositions effector_joints;
+    effector_joints.indexes = indexes;
 
-    for (unsigned int i = 0; i < nao_interfaces::msg::Joints::NUMJOINTS; ++i) {
-      float previous = previousKeyFrame.first.angles[i];
-      float next = nextKeyFrame.first.angles[i];
-      effector_joints.angles[i] = previous * alpha + next * beta;
+    for (unsigned int i = 0; i < nao_command_msgs::msg::JointIndexes::NUMJOINTS; ++i) {
+      float previous = previousKeyFrame.first.positions.at(i);
+      float next = nextKeyFrame.first.positions.at(i);
+      effector_joints.positions.push_back(previous * alpha + next * beta);
 
       RCLCPP_DEBUG(
         this->get_logger(), ("previous, next, result: " + std::to_string(
           previous) + ", " + std::to_string(next) + ", " +
-        std::to_string(effector_joints.angles[i])).c_str());
+        std::to_string(effector_joints.positions.at(i))).c_str());
     }
 
     pub->publish(effector_joints);
   }
 
-  std::pair<nao_interfaces::msg::Joints, int> & findPreviousKeyFrame(int time_ms)
+  std::pair<nao_command_msgs::msg::JointPositions, int> & findPreviousKeyFrame(int time_ms)
   {
     for (auto it = keyFrames.rbegin(); it != keyFrames.rend(); ++it) {
       int keyFrameDeadline = it->second;
@@ -206,9 +243,9 @@ private:
     return jointsWhenActionStarted;
   }
 
-  std::pair<nao_interfaces::msg::Joints, int> & findNextKeyFrame(int time_ms)
+  std::pair<nao_command_msgs::msg::JointPositions, int> & findNextKeyFrame(int time_ms)
   {
-    for (std::pair<nao_interfaces::msg::Joints, int> & keyFrame : keyFrames) {
+    for (std::pair<nao_command_msgs::msg::JointPositions, int> & keyFrame : keyFrames) {
       int keyFrameDeadline = keyFrame.second;
       if (time_ms < keyFrameDeadline) {
         return keyFrame;
@@ -225,7 +262,7 @@ private:
       return true;
     }
 
-    std::pair<nao_interfaces::msg::Joints, int> lastKeyFrame = keyFrames.back();
+    std::pair<nao_command_msgs::msg::JointPositions, int> lastKeyFrame = keyFrames.back();
     int lastKeyFrameTime = lastKeyFrame.second;
     if (time_ms >= lastKeyFrameTime) {
       return true;
@@ -234,16 +271,16 @@ private:
     return false;
   }
 
-  std::vector<std::pair<nao_interfaces::msg::Joints, int>> keyFrames;
+  std::vector<std::pair<nao_command_msgs::msg::JointPositions, int>> keyFrames;
 
-  rclcpp::Subscription<nao_interfaces::msg::Joints>::SharedPtr sub_joint_states;
+  rclcpp::Subscription<nao_sensor_msgs::msg::JointPositions>::SharedPtr sub_joint_states;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr sub_start;
-  rclcpp::Publisher<nao_interfaces::msg::Joints>::SharedPtr pub;
+  rclcpp::Publisher<nao_command_msgs::msg::JointPositions>::SharedPtr pub;
 
   bool fileSuccessfullyRead = false;
   bool posInAction = false;
   bool firstTickSinceActionStarted = true;
-  std::pair<nao_interfaces::msg::Joints, int> jointsWhenActionStarted;
+  std::pair<nao_command_msgs::msg::JointPositions, int> jointsWhenActionStarted;
   rclcpp::Time begin;
 };
 

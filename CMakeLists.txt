@@ -19,7 +19,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(Boost COMPONENTS filesystem REQUIRED)
-find_package(nao_interfaces REQUIRED)
+find_package(nao_sensor_msgs REQUIRED)
+find_package(nao_command_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
 add_executable(linear src/linear.cpp)
@@ -28,7 +29,8 @@ ament_target_dependencies(linear
   rclcpp
   ament_index_cpp
   Boost
-  nao_interfaces
+  nao_sensor_msgs
+  nao_command_msgs
   std_msgs)
 
 install(
