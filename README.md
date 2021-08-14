@@ -7,7 +7,7 @@ Executes a .pos file action for a NAO robot, a filetype defined in rUNSWift's co
 ## Steps
 
 1. Run `rcsoccersim3d`
-2. In a new terminal, run `ros2 run rcss3d_agent rcss3d_agent`
+2. In a new terminal, run `ros2 run rcss3d_nao rcss3d_nao`
 3. In a new terminal, run `ros2 run naosoccer_pos_action linear`
 4. In a new terminal, publish a start message 
   
