@@ -1,6 +1,8 @@
 # naosoccer_pos_action
 
-[![CI](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/main.yml/badge.svg)](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/main.yml)
+[![Build and Test (foxy)](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/build_and_test_foxy.yaml/badge.svg)](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/build_and_test_foxy.yaml)
+[![Build and Test (galactic)](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/build_and_test_galactic.yaml/badge.svg)](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/build_and_test_galactic.yaml)
+[![Build and Test (rolling)](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/build_and_test_rolling.yaml/badge.svg)](https://github.com/ijnek/naosoccer_pos_action/actions/workflows/build_and_test_rolling.yaml)
 
 Executes a .pos file action for a NAO robot, a filetype defined in rUNSWift's codebase.
 
