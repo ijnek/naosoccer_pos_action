@@ -10,6 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
   <depend>boost</depend>
   <depend>nao_sensor_msgs</depend>
   <depend>nao_command_msgs</depend>
