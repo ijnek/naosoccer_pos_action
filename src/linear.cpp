@@ -94,7 +94,7 @@ public:
 private:
   std::string getDefaultFullFilePath()
   {
-    std::string file = "pos/action.pos";
+    std::string file = "pos/move_head.pos";
     std::string package_share_directory = ament_index_cpp::get_package_share_directory(
       "naosoccer_pos_action");
 
