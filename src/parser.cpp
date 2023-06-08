@@ -51,9 +51,10 @@ ParseResult parse(const std::vector<std::string> & in)
 
       // Check size
       if (splitted_line.size() != POSITIONS_SIZE) {
-        RCLCPP_ERROR_STREAM(logger,
+        RCLCPP_ERROR_STREAM(
+          logger,
           "pos file line has " << splitted_line.size() << " elements, but expected " <<
-          POSITIONS_SIZE);
+            POSITIONS_SIZE);
         parseResult.successful = false;
         return parseResult;
       }
@@ -68,7 +69,8 @@ ParseResult parse(const std::vector<std::string> & in)
           float position_rad = position_deg * M_PI / 180;
           jointPositions.positions.push_back(position_rad);
         } catch (std::invalid_argument &) {
-          RCLCPP_ERROR(logger,
+          RCLCPP_ERROR(
+            logger,
             ("joint value '" + position_deg_string +
             "' is not a valid joint value (cannot be converted to float)").c_str());
           parseResult.successful = false;
@@ -81,7 +83,8 @@ ParseResult parse(const std::vector<std::string> & in)
         int duration = std::stoi(duration_string);
         keyFrameTime += duration;
       } catch (std::invalid_argument &) {
-        RCLCPP_ERROR(logger,
+        RCLCPP_ERROR(
+          logger,
           ("duration '" + duration_string +
           "' is not a valid duration value (cannot be converted to int)").c_str());
         parseResult.successful = false;
@@ -99,9 +102,10 @@ ParseResult parse(const std::vector<std::string> & in)
 
       // Check size
       if (splitted_line.size() != STIFFNESSES_SIZE) {
-        RCLCPP_ERROR_STREAM(logger,
+        RCLCPP_ERROR_STREAM(
+          logger,
           "pos file line has " << splitted_line.size() << " elements, but expected " <<
-          STIFFNESSES_SIZE);
+            STIFFNESSES_SIZE);
         parseResult.successful = false;
         return parseResult;
       }
@@ -114,7 +118,8 @@ ParseResult parse(const std::vector<std::string> & in)
           float stiffness_float = std::stof(stiffness_string);
           jointStiffnesses.stiffnesses.push_back(stiffness_float);
         } catch (std::invalid_argument &) {
-          RCLCPP_ERROR(logger,
+          RCLCPP_ERROR(
+            logger,
             ("stiffness value '" + stiffness_string +
             "' is not a valid stiffness value (cannot be converted to float)").c_str());
           parseResult.successful = false;

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef KEY_FRAME_HPP_
-#define KEY_FRAME_HPP_
+#ifndef NAOSOCCER_POS_ACTION__KEY_FRAME_HPP_
+#define NAOSOCCER_POS_ACTION__KEY_FRAME_HPP_
 
 #include "nao_command_msgs/msg/joint_positions.hpp"
 #include "nao_command_msgs/msg/joint_stiffnesses.hpp"
@@ -23,14 +23,14 @@ class KeyFrame
 public:
   KeyFrame(
     unsigned t_ms,
-    const nao_command_msgs::msg::JointPositions &positions,
-    const nao_command_msgs::msg::JointStiffnesses &stiffnesses)
-    : t_ms(t_ms), positions(positions), stiffnesses(stiffnesses)
-    {}
+    const nao_command_msgs::msg::JointPositions & positions,
+    const nao_command_msgs::msg::JointStiffnesses & stiffnesses)
+  : t_ms(t_ms), positions(positions), stiffnesses(stiffnesses)
+  {}
 
   unsigned t_ms;
   nao_command_msgs::msg::JointPositions positions;
   nao_command_msgs::msg::JointStiffnesses stiffnesses;
 };
 
-#endif  // KEY_FRAME_HPP_
+#endif  // NAOSOCCER_POS_ACTION__KEY_FRAME_HPP_
