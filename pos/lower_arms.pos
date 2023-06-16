@@ -1,2 +1,4 @@
+Make the robot stand up with the arms in a downwards position.
+
   HY    HP    LSP   LSR   LEY   LER   LWY   LHYP  LHR   LHP   LKP   LAP   LAR   RHR   RHP   RKP   RAP   RAR   RSP   RSR   REY   RER   RWY   LH    RH    DUR
 ! 0     0   	90     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     90     0     0     0     0     0     0     1500
