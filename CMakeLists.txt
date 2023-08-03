@@ -21,8 +21,8 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(Boost COMPONENTS filesystem REQUIRED)
-find_package(nao_sensor_msgs REQUIRED)
-find_package(nao_command_msgs REQUIRED)
+find_package(nao_lola_sensor_msgs REQUIRED)
+find_package(nao_lola_command_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
@@ -30,8 +30,8 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp_components
   ament_index_cpp
   Boost
-  nao_sensor_msgs
-  nao_command_msgs
+  nao_lola_sensor_msgs
+  nao_lola_command_msgs
   std_msgs)
 
 # Build

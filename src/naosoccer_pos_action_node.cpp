@@ -32,46 +32,46 @@ namespace naosoccer_pos_action
 {
 
 std::vector<uint8_t> indexes = {
-  nao_command_msgs::msg::JointIndexes::HEADYAW,
-  nao_command_msgs::msg::JointIndexes::HEADPITCH,
-  nao_command_msgs::msg::JointIndexes::LSHOULDERPITCH,
-  nao_command_msgs::msg::JointIndexes::LSHOULDERROLL,
-  nao_command_msgs::msg::JointIndexes::LELBOWYAW,
-  nao_command_msgs::msg::JointIndexes::LELBOWROLL,
-  nao_command_msgs::msg::JointIndexes::LWRISTYAW,
-  nao_command_msgs::msg::JointIndexes::LHIPYAWPITCH,
-  nao_command_msgs::msg::JointIndexes::LHIPROLL,
-  nao_command_msgs::msg::JointIndexes::LHIPPITCH,
-  nao_command_msgs::msg::JointIndexes::LKNEEPITCH,
-  nao_command_msgs::msg::JointIndexes::LANKLEPITCH,
-  nao_command_msgs::msg::JointIndexes::LANKLEROLL,
-  nao_command_msgs::msg::JointIndexes::RHIPROLL,
-  nao_command_msgs::msg::JointIndexes::RHIPPITCH,
-  nao_command_msgs::msg::JointIndexes::RKNEEPITCH,
-  nao_command_msgs::msg::JointIndexes::RANKLEPITCH,
-  nao_command_msgs::msg::JointIndexes::RANKLEROLL,
-  nao_command_msgs::msg::JointIndexes::RSHOULDERPITCH,
-  nao_command_msgs::msg::JointIndexes::RSHOULDERROLL,
-  nao_command_msgs::msg::JointIndexes::RELBOWYAW,
-  nao_command_msgs::msg::JointIndexes::RELBOWROLL,
-  nao_command_msgs::msg::JointIndexes::RWRISTYAW,
-  nao_command_msgs::msg::JointIndexes::LHAND,
-  nao_command_msgs::msg::JointIndexes::RHAND};
+  nao_lola_command_msgs::msg::JointIndexes::HEADYAW,
+  nao_lola_command_msgs::msg::JointIndexes::HEADPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::LSHOULDERPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::LSHOULDERROLL,
+  nao_lola_command_msgs::msg::JointIndexes::LELBOWYAW,
+  nao_lola_command_msgs::msg::JointIndexes::LELBOWROLL,
+  nao_lola_command_msgs::msg::JointIndexes::LWRISTYAW,
+  nao_lola_command_msgs::msg::JointIndexes::LHIPYAWPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::LHIPROLL,
+  nao_lola_command_msgs::msg::JointIndexes::LHIPPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::LKNEEPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::LANKLEPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::LANKLEROLL,
+  nao_lola_command_msgs::msg::JointIndexes::RHIPROLL,
+  nao_lola_command_msgs::msg::JointIndexes::RHIPPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::RKNEEPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::RANKLEPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::RANKLEROLL,
+  nao_lola_command_msgs::msg::JointIndexes::RSHOULDERPITCH,
+  nao_lola_command_msgs::msg::JointIndexes::RSHOULDERROLL,
+  nao_lola_command_msgs::msg::JointIndexes::RELBOWYAW,
+  nao_lola_command_msgs::msg::JointIndexes::RELBOWROLL,
+  nao_lola_command_msgs::msg::JointIndexes::RWRISTYAW,
+  nao_lola_command_msgs::msg::JointIndexes::LHAND,
+  nao_lola_command_msgs::msg::JointIndexes::RHAND};
 
 NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node{"NaosoccerPosActionNode", options}
 {
   this->declare_parameter<std::string>("file", getDefaultFullFilePath());
 
-  pub_joint_positions = create_publisher<nao_command_msgs::msg::JointPositions>(
+  pub_joint_positions = create_publisher<nao_lola_command_msgs::msg::JointPositions>(
     "effectors/joint_positions", 1);
-  pub_joint_stiffnesses = create_publisher<nao_command_msgs::msg::JointStiffnesses>(
+  pub_joint_stiffnesses = create_publisher<nao_lola_command_msgs::msg::JointStiffnesses>(
     "effectors/joint_stiffnesses", 1);
 
   sub_joint_states =
-    create_subscription<nao_sensor_msgs::msg::JointPositions>(
+    create_subscription<nao_lola_sensor_msgs::msg::JointPositions>(
     "sensors/joint_positions", 1,
-    [this](nao_sensor_msgs::msg::JointPositions::SharedPtr sensor_joints) {
+    [this](nao_lola_sensor_msgs::msg::JointPositions::SharedPtr sensor_joints) {
       if (posInAction) {
         calculateEffectorJoints(*sensor_joints);
       }
@@ -134,7 +134,7 @@ std::vector<std::string> NaosoccerPosActionNode::readLines(std::ifstream & ifstr
 }
 
 void NaosoccerPosActionNode::calculateEffectorJoints(
-  nao_sensor_msgs::msg::JointPositions & sensor_joints)
+  nao_lola_sensor_msgs::msg::JointPositions & sensor_joints)
 {
   int time_ms = (rclcpp::Node::now() - begin).nanoseconds() / 1e6;
 
@@ -146,12 +146,12 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
   }
 
   if (firstTickSinceActionStarted) {
-    nao_command_msgs::msg::JointPositions command;
+    nao_lola_command_msgs::msg::JointPositions command;
     command.indexes = indexes;
     command.positions = std::vector<float>(
       sensor_joints.positions.begin(), sensor_joints.positions.end());
     keyFrameStart =
-      std::make_unique<KeyFrame>(0, command, nao_command_msgs::msg::JointStiffnesses{});
+      std::make_unique<KeyFrame>(0, command, nao_lola_command_msgs::msg::JointStiffnesses{});
     firstTickSinceActionStarted = false;
   }
 
@@ -176,10 +176,10 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
     this->get_logger(), ("alpha, beta: " + std::to_string(alpha) + ", " + std::to_string(
       beta)).c_str());
 
-  nao_command_msgs::msg::JointPositions effector_joints;
+  nao_lola_command_msgs::msg::JointPositions effector_joints;
   effector_joints.indexes = indexes;
 
-  for (unsigned int i = 0; i < nao_command_msgs::msg::JointIndexes::NUMJOINTS; ++i) {
+  for (unsigned int i = 0; i < nao_lola_command_msgs::msg::JointIndexes::NUMJOINTS; ++i) {
     float previous = previousKeyFrame.positions.positions.at(i);
     float next = nextKeyFrame.positions.positions.at(i);
     effector_joints.positions.push_back(previous * alpha + next * beta);
