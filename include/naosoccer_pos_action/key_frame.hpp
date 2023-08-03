@@ -15,22 +15,22 @@
 #ifndef NAOSOCCER_POS_ACTION__KEY_FRAME_HPP_
 #define NAOSOCCER_POS_ACTION__KEY_FRAME_HPP_
 
-#include "nao_command_msgs/msg/joint_positions.hpp"
-#include "nao_command_msgs/msg/joint_stiffnesses.hpp"
+#include "nao_lola_command_msgs/msg/joint_positions.hpp"
+#include "nao_lola_command_msgs/msg/joint_stiffnesses.hpp"
 
 class KeyFrame
 {
 public:
   KeyFrame(
     unsigned t_ms,
-    const nao_command_msgs::msg::JointPositions & positions,
-    const nao_command_msgs::msg::JointStiffnesses & stiffnesses)
+    const nao_lola_command_msgs::msg::JointPositions & positions,
+    const nao_lola_command_msgs::msg::JointStiffnesses & stiffnesses)
   : t_ms(t_ms), positions(positions), stiffnesses(stiffnesses)
   {}
 
   unsigned t_ms;
-  nao_command_msgs::msg::JointPositions positions;
-  nao_command_msgs::msg::JointStiffnesses stiffnesses;
+  nao_lola_command_msgs::msg::JointPositions positions;
+  nao_lola_command_msgs::msg::JointStiffnesses stiffnesses;
 };
 
 #endif  // NAOSOCCER_POS_ACTION__KEY_FRAME_HPP_

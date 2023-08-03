@@ -21,10 +21,10 @@
 #include <vector>
 
 #include "naosoccer_pos_action/key_frame.hpp"
-#include "nao_command_msgs/msg/joint_positions.hpp"
-#include "nao_command_msgs/msg/joint_stiffnesses.hpp"
-#include "nao_command_msgs/msg/joint_indexes.hpp"
-#include "nao_sensor_msgs/msg/joint_positions.hpp"
+#include "nao_lola_command_msgs/msg/joint_positions.hpp"
+#include "nao_lola_command_msgs/msg/joint_stiffnesses.hpp"
+#include "nao_lola_command_msgs/msg/joint_indexes.hpp"
+#include "nao_lola_sensor_msgs/msg/joint_positions.hpp"
 #include "rclcpp/node.hpp"
 #include "rclcpp/time.hpp"
 #include "std_msgs/msg/bool.hpp"
@@ -42,15 +42,15 @@ public:
 private:
   std::string getDefaultFullFilePath();
   std::vector<std::string> readLines(std::ifstream & ifstream);
-  void calculateEffectorJoints(nao_sensor_msgs::msg::JointPositions & sensor_joints);
+  void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions & sensor_joints);
   const KeyFrame & findPreviousKeyFrame(int time_ms);
   const KeyFrame & findNextKeyFrame(int time_ms);
   bool posFinished(int time_ms);
 
-  rclcpp::Subscription<nao_sensor_msgs::msg::JointPositions>::SharedPtr sub_joint_states;
+  rclcpp::Subscription<nao_lola_sensor_msgs::msg::JointPositions>::SharedPtr sub_joint_states;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr sub_start;
-  rclcpp::Publisher<nao_command_msgs::msg::JointPositions>::SharedPtr pub_joint_positions;
-  rclcpp::Publisher<nao_command_msgs::msg::JointStiffnesses>::SharedPtr pub_joint_stiffnesses;
+  rclcpp::Publisher<nao_lola_command_msgs::msg::JointPositions>::SharedPtr pub_joint_positions;
+  rclcpp::Publisher<nao_lola_command_msgs::msg::JointStiffnesses>::SharedPtr pub_joint_stiffnesses;
 
   bool fileSuccessfullyRead = false;
   std::vector<KeyFrame> keyFrames;

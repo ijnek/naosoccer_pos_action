@@ -12,8 +12,8 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>boost</depend>
-  <depend>nao_sensor_msgs</depend>
-  <depend>nao_command_msgs</depend>
+  <depend>nao_lola_sensor_msgs</depend>
+  <depend>nao_lola_command_msgs</depend>
   <depend>std_msgs</depend>
   <depend>ament_index_cpp</depend>
 
