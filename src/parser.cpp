@@ -27,7 +27,8 @@
 #define STIFFNESSES_SIZE (nao_command_msgs::msg::JointIndexes::NUMJOINTS + 1)
 
 const auto stiffnessMax = nao_command_msgs::msg::JointStiffnesses()
-  .set__indexes({1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1});
+  .set__indexes({1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
+  .set__stiffnesses({1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1});
 
 namespace parser
 {
