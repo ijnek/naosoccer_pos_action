@@ -35,8 +35,8 @@ TEST(TestParser, TestParsePosition)
 
   auto parseResult = parser::parse(testString);
   ASSERT_TRUE(parseResult.successful);
-  ASSERT_EQ(parseResult.keyFrames.size(), 1);
-  EXPECT_EQ(parseResult.keyFrames.at(0).t_ms, 300);
+  ASSERT_EQ(parseResult.keyFrames.size(), (unsigned)1);
+  EXPECT_EQ(parseResult.keyFrames.at(0).t_ms, (unsigned)300);
   EXPECT_NEAR(parseResult.keyFrames.at(0).positions.positions.at(1), 90 * M_PI / 180.0, 0.0001);
 }
 
@@ -49,8 +49,8 @@ TEST(TestParser, TestParseStiffness)
 
   auto parseResult = parser::parse(testString);
   ASSERT_TRUE(parseResult.successful);
-  ASSERT_EQ(parseResult.keyFrames.size(), 1);
-  EXPECT_EQ(parseResult.keyFrames.at(0).t_ms, 300);
+  ASSERT_EQ(parseResult.keyFrames.size(), (unsigned)1);
+  EXPECT_EQ(parseResult.keyFrames.at(0).t_ms, (unsigned)300);
   EXPECT_NEAR(parseResult.keyFrames.at(0).stiffnesses.stiffnesses.at(1), 0.2, 0.0001);
 }
 
@@ -65,7 +65,7 @@ TEST(TestParser, TestDuration)
 
   auto parseResult = parser::parse(testString);
   ASSERT_TRUE(parseResult.successful);
-  ASSERT_EQ(parseResult.keyFrames.size(), 2);
-  EXPECT_EQ(parseResult.keyFrames.at(0).t_ms, 300);
-  EXPECT_EQ(parseResult.keyFrames.at(1).t_ms, 600);
+  ASSERT_EQ(parseResult.keyFrames.size(), (unsigned)2);
+  EXPECT_EQ(parseResult.keyFrames.at(0).t_ms, (unsigned)300);
+  EXPECT_EQ(parseResult.keyFrames.at(1).t_ms, (unsigned)600);
 }
