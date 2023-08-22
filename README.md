@@ -6,7 +6,15 @@
 
 Executes a .pos file action for a NAO robot, a filetype defined in rUNSWift's codebase.
 
-## Steps
+## Steps (on real robot)
+
+1. On a terminal on the robot, run `ros2 run nao_lola nao_lola`
+2. In a new terminal (either on robot, or on your machine), run `ros2 run naosoccer_pos_action naosoccer_pos_action`
+3. In a new terminal (either on robot, or on your machine), publish a start message
+
+    `ros2 topic pub --once start_pos_action std_msgs/msg/Bool '{data: true}'`
+
+## Steps (simulation using rcsoccer3d)
 
 1. Run `rcsoccersim3d`
 2. In a new terminal, run `ros2 run rcss3d_nao rcss3d_nao`
@@ -15,7 +23,10 @@ Executes a .pos file action for a NAO robot, a filetype defined in rUNSWift's co
 
     `ros2 topic pub --once start_pos_action std_msgs/msg/Bool '{data: true}'`
 
-Pos file can be specified using rosargs in step 3, such as:
+## Using a different motion.
+
+Pos files define the different motions, and can be specified using a ros parameter for the naosoccer_pos_action node.
+To set the parameter, when running the naosoccer_pos_action node in the steps above, instead do the following:
 
 ```
 ros2 run naosoccer_pos_action linear --ros-args -p "file:=src/naosoccer_pos_action/pos/tilt.pos"
