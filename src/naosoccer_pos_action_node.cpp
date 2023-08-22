@@ -24,39 +24,13 @@
 #include "boost/filesystem.hpp"
 #include "rclcpp/rclcpp.hpp"
 
+#include "indexes.hpp"
 #include "parser.hpp"
 
 namespace fs = boost::filesystem;
 
 namespace naosoccer_pos_action
 {
-
-std::vector<uint8_t> indexes = {
-  nao_command_msgs::msg::JointIndexes::HEADYAW,
-  nao_command_msgs::msg::JointIndexes::HEADPITCH,
-  nao_command_msgs::msg::JointIndexes::LSHOULDERPITCH,
-  nao_command_msgs::msg::JointIndexes::LSHOULDERROLL,
-  nao_command_msgs::msg::JointIndexes::LELBOWYAW,
-  nao_command_msgs::msg::JointIndexes::LELBOWROLL,
-  nao_command_msgs::msg::JointIndexes::LWRISTYAW,
-  nao_command_msgs::msg::JointIndexes::LHIPYAWPITCH,
-  nao_command_msgs::msg::JointIndexes::LHIPROLL,
-  nao_command_msgs::msg::JointIndexes::LHIPPITCH,
-  nao_command_msgs::msg::JointIndexes::LKNEEPITCH,
-  nao_command_msgs::msg::JointIndexes::LANKLEPITCH,
-  nao_command_msgs::msg::JointIndexes::LANKLEROLL,
-  nao_command_msgs::msg::JointIndexes::RHIPROLL,
-  nao_command_msgs::msg::JointIndexes::RHIPPITCH,
-  nao_command_msgs::msg::JointIndexes::RKNEEPITCH,
-  nao_command_msgs::msg::JointIndexes::RANKLEPITCH,
-  nao_command_msgs::msg::JointIndexes::RANKLEROLL,
-  nao_command_msgs::msg::JointIndexes::RSHOULDERPITCH,
-  nao_command_msgs::msg::JointIndexes::RSHOULDERROLL,
-  nao_command_msgs::msg::JointIndexes::RELBOWYAW,
-  nao_command_msgs::msg::JointIndexes::RELBOWROLL,
-  nao_command_msgs::msg::JointIndexes::RWRISTYAW,
-  nao_command_msgs::msg::JointIndexes::LHAND,
-  nao_command_msgs::msg::JointIndexes::RHAND};
 
 NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node{"NaosoccerPosActionNode", options}
@@ -147,7 +121,7 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
 
   if (firstTickSinceActionStarted) {
     nao_command_msgs::msg::JointPositions command;
-    command.indexes = indexes;
+    command.indexes = indexes::indexes;
     command.positions = std::vector<float>(
       sensor_joints.positions.begin(), sensor_joints.positions.end());
     keyFrameStart =
@@ -177,7 +151,7 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
       beta)).c_str());
 
   nao_command_msgs::msg::JointPositions effector_joints;
-  effector_joints.indexes = indexes;
+  effector_joints.indexes = indexes::indexes;
 
   for (unsigned int i = 0; i < nao_command_msgs::msg::JointIndexes::NUMJOINTS; ++i) {
     float previous = previousKeyFrame.positions.positions.at(i);

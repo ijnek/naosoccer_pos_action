@@ -20,6 +20,7 @@
 
 #include "rclcpp/logging.hpp"
 #include "nao_command_msgs/msg/joint_indexes.hpp"
+#include "indexes.hpp"
 
 // +2 because there is the "!" at the start, and the duration at the end
 #define POSITIONS_SIZE (nao_command_msgs::msg::JointIndexes::NUMJOINTS + 2)
@@ -27,7 +28,8 @@
 #define STIFFNESSES_SIZE (nao_command_msgs::msg::JointIndexes::NUMJOINTS + 1)
 
 const auto stiffnessMax = nao_command_msgs::msg::JointStiffnesses()
-  .set__indexes({1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1});
+  .set__indexes(indexes::indexes)
+  .set__stiffnesses({1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1});
 
 namespace parser
 {
@@ -61,6 +63,7 @@ ParseResult parse(const std::vector<std::string> & in)
 
       // Convert to data type
       nao_command_msgs::msg::JointPositions jointPositions;
+      jointPositions.indexes = indexes::indexes;
       for (unsigned int i = 1; i < nao_command_msgs::msg::JointIndexes::NUMJOINTS + 1; ++i) {
         std::string position_deg_string = splitted_line.at(i);
 
@@ -111,6 +114,7 @@ ParseResult parse(const std::vector<std::string> & in)
       }
 
       // Convert to data type
+      jointStiffnesses.stiffnesses.clear();
       for (unsigned int i = 1; i < nao_command_msgs::msg::JointIndexes::NUMJOINTS + 1; ++i) {
         std::string stiffness_string = splitted_line.at(i);
 
