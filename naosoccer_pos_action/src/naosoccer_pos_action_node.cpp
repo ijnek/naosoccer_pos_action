@@ -51,17 +51,12 @@ NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & optio
       }
     });
 
-  sub_start =
-    create_subscription<std_msgs::msg::Bool>(
-    "start_pos_action", 1,
-    [this](std_msgs::msg::Bool::UniquePtr start_pos_action) {
-      if (start_pos_action->data && fileSuccessfullyRead && !posInAction) {
-        RCLCPP_DEBUG(this->get_logger(), "Starting Pos Action");
-        begin = rclcpp::Node::now();
-        posInAction = true;
-        firstTickSinceActionStarted = true;
-      }
-    });
+  action_server_ = rclcpp_action::create_server<naosoccer_pos_action_interfaces::action::Action>(
+    this,
+    "action",
+    std::bind(&NaosoccerPosActionNode::handleGoal, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&NaosoccerPosActionNode::handleCancel, this, std::placeholders::_1),
+    std::bind(&NaosoccerPosActionNode::handleAccepted, this, std::placeholders::_1));
 
   std::string filePath;
   this->get_parameter("file", filePath);
@@ -110,12 +105,17 @@ std::vector<std::string> NaosoccerPosActionNode::readLines(std::ifstream & ifstr
 void NaosoccerPosActionNode::calculateEffectorJoints(
   nao_lola_sensor_msgs::msg::JointPositions & sensor_joints)
 {
+  std::lock_guard<std::mutex> lock(mutex);
+
   int time_ms = (rclcpp::Node::now() - begin).nanoseconds() / 1e6;
 
   if (posFinished(time_ms)) {
     // We've finished the motion, set to DONE
     posInAction = false;
-    RCLCPP_DEBUG(this->get_logger(), "Pos finished");
+    RCLCPP_DEBUG(this->get_logger(), "Pos finished before");
+    auto result = std::make_shared<naosoccer_pos_action_interfaces::action::Action::Result>();
+    goal_handle_->succeed(result);
+    RCLCPP_DEBUG(this->get_logger(), "Pos finished after");
     return;
   }
 
@@ -207,6 +207,41 @@ bool NaosoccerPosActionNode::posFinished(int time_ms)
   }
 
   return false;
+}
+
+rclcpp_action::GoalResponse NaosoccerPosActionNode::handleGoal(
+  const rclcpp_action::GoalUUID & uuid,
+  std::shared_ptr<const naosoccer_pos_action_interfaces::action::Action::Goal> goal)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  // RCLCPP_INFO(get_logger(), "Received goal request");
+  (void)uuid;
+  (void)goal;
+  if (!fileSuccessfullyRead || posInAction) {
+    return rclcpp_action::GoalResponse::REJECT;
+  } else {
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+}
+rclcpp_action::CancelResponse NaosoccerPosActionNode::handleCancel(
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_action_interfaces::action::Action>> goal_handle)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  // RCLCPP_INFO(get_logger(), "Received request to cancel goal");
+  (void)goal_handle;
+  posInAction = false;
+  goal_handle_.reset();
+  return rclcpp_action::CancelResponse::ACCEPT;
+}
+void NaosoccerPosActionNode::handleAccepted(
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_action_interfaces::action::Action>> goal_handle)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  RCLCPP_DEBUG(this->get_logger(), "Starting Pos Action");
+  begin = rclcpp::Node::now();
+  posInAction = true;
+  firstTickSinceActionStarted = true;
+  goal_handle_ = goal_handle;
 }
 
 }  // namespace naosoccer_pos_action
