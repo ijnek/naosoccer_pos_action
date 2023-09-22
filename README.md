@@ -29,5 +29,5 @@ Pos files define the different motions, and can be specified using a ros paramet
 To set the parameter, when running the naosoccer_pos_action node in the steps above, instead do the following:
 
 ```
-ros2 run naosoccer_pos_action linear --ros-args -p "file:=src/naosoccer_pos_action/pos/tilt.pos"
+ros2 run naosoccer_pos_action naosoccer_pos_action --ros-args -p "file:=src/naosoccer_pos_action/pos/tilt.pos"
 ```
