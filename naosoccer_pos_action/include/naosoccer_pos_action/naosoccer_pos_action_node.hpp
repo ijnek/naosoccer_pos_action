@@ -42,11 +42,13 @@ public:
 
 private:
   std::string getDefaultFullFilePath();
+  std::string getFullFilePath(std::string & filename);
   std::vector<std::string> readLines(std::ifstream & ifstream);
   void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions & sensor_joints);
   const KeyFrame & findPreviousKeyFrame(int time_ms);
   const KeyFrame & findNextKeyFrame(int time_ms);
   bool posFinished(int time_ms);
+  void readPosFile(std::string & filePath);
 
   rclcpp_action::GoalResponse handleGoal(
     const rclcpp_action::GoalUUID & uuid,

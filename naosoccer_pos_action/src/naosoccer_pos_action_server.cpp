@@ -53,7 +53,7 @@ NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & optio
 
   action_server_ = rclcpp_action::create_server<naosoccer_pos_action_interfaces::action::Action>(
     this,
-    "action",
+    "naosoccer_pos_action",
     std::bind(&NaosoccerPosActionNode::handleGoal, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(&NaosoccerPosActionNode::handleCancel, this, std::placeholders::_1),
     std::bind(&NaosoccerPosActionNode::handleAccepted, this, std::placeholders::_1));
@@ -73,13 +73,43 @@ NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & optio
     RCLCPP_ERROR(this->get_logger(), "Couldn't open file");
     fileSuccessfullyRead = false;
   }
+
+  RCLCPP_INFO(this->get_logger(), "NaosoccerPosActionServer initialized");
 }
 
 NaosoccerPosActionNode::~NaosoccerPosActionNode() {}
 
+void NaosoccerPosActionNode::readPosFile(std::string & filePath)
+{
+  std::ifstream ifstream(filePath);
+  if (ifstream.is_open()) {
+    RCLCPP_DEBUG(this->get_logger(), ("Pos file succesfully loaded from " + filePath).c_str());
+    fileSuccessfullyRead = true;
+    auto lines = readLines(ifstream);
+    auto parseResult = parser::parse(lines);
+    fileSuccessfullyRead = parseResult.successful;
+    keyFrames = parseResult.keyFrames;
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Couldn't open file");
+    fileSuccessfullyRead = false;
+  }
+}
+
 std::string NaosoccerPosActionNode::getDefaultFullFilePath()
 {
-  std::string file = "pos/action.pos";
+  std::string file = "pos/initial.pos";
+  std::string package_share_directory = ament_index_cpp::get_package_share_directory(
+    "naosoccer_pos_action");
+
+  fs::path dir_path(package_share_directory);
+  fs::path file_path(file);
+  fs::path full_path = dir_path / file_path;
+  return full_path.string();
+}
+
+std::string NaosoccerPosActionNode::getFullFilePath(std::string & filename)
+{
+  std::string file = "pos/"+filename;
   std::string package_share_directory = ament_index_cpp::get_package_share_directory(
     "naosoccer_pos_action");
 
@@ -214,15 +244,22 @@ rclcpp_action::GoalResponse NaosoccerPosActionNode::handleGoal(
   std::shared_ptr<const naosoccer_pos_action_interfaces::action::Action::Goal> goal)
 {
   std::lock_guard<std::mutex> lock(mutex);
-  // RCLCPP_INFO(get_logger(), "Received goal request");
+  RCLCPP_INFO(get_logger(), "Received goal request");
   (void)uuid;
   (void)goal;
+
+  std::string filename = goal->action_name + ".pos";
+  std::string path = getFullFilePath(filename);
+  readPosFile(path);
+
   if (!fileSuccessfullyRead || posInAction) {
     return rclcpp_action::GoalResponse::REJECT;
   } else {
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 }
+
+
 rclcpp_action::CancelResponse NaosoccerPosActionNode::handleCancel(
   const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_action_interfaces::action::Action>> goal_handle)
 {
