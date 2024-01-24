@@ -129,11 +129,10 @@ std::vector<std::string> NaosoccerPosActionNode::readLines(std::ifstream & ifstr
   return ret;
 }
 
-template<class T> int NaosoccerPosActionNode::findFirst(T arr[], T element)
-{
-  int length = sizeof(arr)/sizeof(arr[0]);
-  for (int i=0; i<length; i++){
-    if (arr[i]==element)
+template<class T> int NaosoccerPosActionNode::findFirst(T arr[], T element) {
+  int length = sizeof(arr) / sizeof(arr[0]);
+  for (int i = 0; i < length; i++) {
+    if (arr[i] == element)
       return i;
   }
   return -1;
@@ -176,11 +175,11 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
     firstTickSinceActionStarted_ = false;
 
     RCLCPP_INFO(this->get_logger(), "first tick false");
-    std::string s1="";
+    /*std::string s1="";
     for (unsigned c = 0; c < selected_joints_.size(); c++) {
         s1.append( std::to_string(selected_joints_.at(c))+", " );
     }
-    RCLCPP_INFO(this->get_logger(), ("selected_joints_: "+s1).c_str() );
+    RCLCPP_INFO(this->get_logger(), ("selected_joints_: "+s1).c_str() );*/
 
   }
 
@@ -203,69 +202,34 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
   nao_lola_command_msgs::msg::JointPositions effector_joints;
   nao_lola_command_msgs::msg::JointStiffnesses effector_joints_stiff;
 
-    for(uint8_t i : selected_joints_) {
+  bool flag;
+  float next=NAN, previous=NAN;
+  for (uint8_t i : selected_joints_) {
 
-      bool stop=false;
-      float next;
-      //int a = findFirst(nextKeyFrame.positions.indexes, i);
-      //int length = sizeof(nextKeyFrame.positions.indexes)/sizeof(nextKeyFrame.positions.indexes[0]);
-      uint8_t a;
-      //RCLCPP_INFO(this->get_logger(), ("nextKeyFrame.positions.indexes.size(): "+std::to_string(nextKeyFrame.positions.indexes.size())).c_str());
-      //RCLCPP_INFO(this->get_logger(), ("nextKeyFrame.positions.positions.size(): "+std::to_string(nextKeyFrame.positions.positions.size())).c_str());
-      for (a=0; a<nextKeyFrame.positions.indexes.size() && !stop; a++){
-        //if(i==24) RCLCPP_INFO(this->get_logger(), ("a: "+std::to_string(a)).c_str()); //OK
-        //if(a==22) RCLCPP_INFO(this->get_logger(), "out");
-        if (nextKeyFrame.positions.indexes.at(a)==i){
-          next = nextKeyFrame.positions.positions.at(a);
-          stop=true;
-          RCLCPP_INFO(this->get_logger(), "found");
-        }
+    flag = false;
+    uint8_t a;
+    for (a = 0; a < nextKeyFrame.positions.indexes.size() && !flag; a++) {
+      if (nextKeyFrame.positions.indexes.at(a) == i) {
+        next = nextKeyFrame.positions.positions.at(a);
+        flag = true;
       }
-      RCLCPP_INFO(this->get_logger(), "nextKeyFrameOK"); //OK
+    }
+    // TODO raise exception if not found
 
-      stop=false;
-      float previous;
-      //int a = findFirst(nextKeyFrame.positions.indexes, i);
-      //length = sizeof(previousKeyFrame.positions.indexes)/sizeof(previousKeyFrame.positions.indexes[0]);
-      //RCLCPP_INFO(this->get_logger(), ("previousKeyFrame.positions.indexes.size(): "+std::to_string(previousKeyFrame.positions.indexes.size())).c_str());
-      //RCLCPP_INFO(this->get_logger(), ("previousKeyFrame.positions.positions.size(): "+std::to_string(previousKeyFrame.positions.positions.size())).c_str());
-      for (a=0; a<previousKeyFrame.positions.indexes.size() && !stop; a++){
-        //RCLCPP_INFO(this->get_logger(), ("a: "+std::to_string(a)).c_str()); //OK
-        if (previousKeyFrame.positions.indexes.at(a)==i){
-          previous = previousKeyFrame.positions.positions.at(a);
-          stop=true;
-        }
+    flag = false;
+    for (a = 0; a < previousKeyFrame.positions.indexes.size() && !flag; a++) {
+      if (previousKeyFrame.positions.indexes.at(a) == i) {
+        previous = previousKeyFrame.positions.positions.at(a);
+        flag = true;
       }
-      RCLCPP_INFO(this->get_logger(), "previousKeyFrameOK"); //OK
-
-      effector_joints.indexes.push_back(i);
-       RCLCPP_INFO(this->get_logger(), "push1 ok"); //OK
-      effector_joints.positions.push_back(previous * alpha + next * beta);
-       RCLCPP_INFO(this->get_logger(), "push2 ok"); //OK
-
-      effector_joints_stiff.indexes.push_back(i);
-      RCLCPP_INFO(this->get_logger(), "push3 ok"); //OK
-      //effector_joints_stiff.stiffnesses.push_back( nextKeyFrame.stiffnesses.stiffnesses.at(a));
-      
-      effector_joints_stiff.stiffnesses.push_back( 1.0f );
-      RCLCPP_INFO(this->get_logger(), "push4 ok");
-      RCLCPP_INFO(this->get_logger(), "push4 okooo");
-      /*RCLCPP_INFO(
-        this->get_logger(), ("previous, next, result: " + std::to_string(
-                               previous) + ", " + std::to_string(next) + ", " +
-                             std::to_string(effector_joints.positions.at(i))).c_str());*/
     }
 
-  /*for (unsigned int i = 0; i < nextKeyFrame; ++i) {
-    float previous = previousKeyFrame.positions.positions.at(i);
-    float next = nextKeyFrame.positions.positions.at(i);
-    effector_joints.positions.push_back(previous * alpha + next * beta); // convex combination on the line between previous and next
-
-    RCLCPP_DEBUG(
-      this->get_logger(), ("previous, next, result: " + std::to_string(
-                             previous) + ", " + std::to_string(next) + ", " +
-                           std::to_string(effector_joints.positions.at(i))).c_str());
-  }*/
+    effector_joints.indexes.push_back(i);
+    effector_joints.positions.push_back(previous * alpha + next * beta);
+    effector_joints_stiff.indexes.push_back(i);
+    effector_joints_stiff.stiffnesses.push_back( 1.0f );
+    next=NAN, previous=NAN;
+  }
 
   pub_joint_positions->publish(effector_joints);
   pub_joint_stiffnesses->publish(effector_joints_stiff);
