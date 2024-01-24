@@ -49,6 +49,7 @@ private:
   const KeyFrame & findNextKeyFrame(int time_ms);
   bool posFinished(int time_ms);
   void readPosFile(std::string & filePath);
+  template<class T> int findFirst(T arr[], T element);
 
   rclcpp_action::GoalResponse handleGoal(
     const rclcpp_action::GoalUUID & uuid,
@@ -64,12 +65,13 @@ private:
 
   rclcpp_action::Server<naosoccer_pos_action_interfaces::action::Action>::SharedPtr action_server_;
 
-  bool fileSuccessfullyRead = false;
-  std::vector<KeyFrame> keyFrames;
-  bool posInAction = false;
-  bool firstTickSinceActionStarted = true;
-  std::unique_ptr<KeyFrame> keyFrameStart;
-  rclcpp::Time begin;
+  bool file_successfully_read_ = false;
+  std::vector<KeyFrame> key_frames_;
+  bool pos_in_action_ = false;
+  bool firstTickSinceActionStarted_ = true;
+  std::unique_ptr<KeyFrame> key_frame_start_;
+  rclcpp::Time initial_time_;
+  std::vector<uint8_t> selected_joints_;
 
   std::shared_ptr<rclcpp_action::ServerGoalHandle<
       naosoccer_pos_action_interfaces::action::Action>> goal_handle_;
