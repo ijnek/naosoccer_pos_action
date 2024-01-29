@@ -36,15 +36,15 @@ namespace naosoccer_pos_action {
 
 NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & options)
   : rclcpp::Node{"NaosoccerPosActionNode", options} {
-    
+
   pub_joint_positions = create_publisher<nao_lola_command_msgs::msg::JointPositions>(
-                          "effectors/joint_positions", 1);
+                          "/effectors/joint_positions", 1);
   pub_joint_stiffnesses = create_publisher<nao_lola_command_msgs::msg::JointStiffnesses>(
-                            "effectors/joint_stiffnesses", 1);
+                            "/effectors/joint_stiffnesses", 1);
 
   sub_joint_states =
     create_subscription<nao_lola_sensor_msgs::msg::JointPositions>(
-      "sensors/joint_positions", 1,
+      "/sensors/joint_positions", 1,
   [this](nao_lola_sensor_msgs::msg::JointPositions::SharedPtr sensor_joints) {
     if (pos_in_action_) {
       calculateEffectorJoints(*sensor_joints);
