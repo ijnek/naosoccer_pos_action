@@ -17,10 +17,13 @@
 #include <cmath>
 #include <iterator>
 #include <iostream>
+#include <vector>
 
 #include "rclcpp/logging.hpp"
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "indexes.hpp"
+
+//using namespace std;
 
 // +2 because there is the "!" at the start, and the duration at the end
 #define POSITIONS_SIZE (nao_lola_command_msgs::msg::JointIndexes::NUMJOINTS + 2)
@@ -33,6 +36,18 @@
 */
 
 namespace parser {
+
+template <typename S>
+std::ostream& operator<<(std::ostream& os,
+                    const std::vector<S>& vector)
+{
+    // Printing all the elements
+    // using <<
+    for (auto element : vector) {
+        os << element << " ";
+    }
+    return os;
+}  
 
 static rclcpp::Logger logger = rclcpp::get_logger("parser");
 
@@ -48,6 +63,8 @@ ParseResult parse(const std::vector<std::string> & in) {
 
   std::vector<int> selected_positions;
   std::vector<int> selected_stiffness;
+  bool firstPosLine = true;
+  nao_lola_command_msgs::msg::JointPositions prevJointPositions;
 
   for (const auto & line : in) {
     if (line.front() == '!') {
@@ -94,6 +111,19 @@ ParseResult parse(const std::vector<std::string> & in) {
 
       }
 
+      if (firstPosLine){
+        firstPosLine=false;
+      }else{
+        if(jointPositions.indexes!=prevJointPositions.indexes){
+          RCLCPP_ERROR_STREAM(
+                logger,
+                "two or more joint positions vectors are not the same ");
+              parseResult.successful = false;
+              return parseResult;
+        }
+      }
+
+
       std::string duration_string = splitted_line.back();
       try {
         int duration = std::stoi(duration_string);
@@ -112,7 +142,7 @@ ParseResult parse(const std::vector<std::string> & in) {
           if(jointPositions.indexes.at(i)!=jointStiffnesses.indexes.at(i)){
             RCLCPP_ERROR(
                 logger,
-                "joint positions and joint stiffness are not the same.");
+                "joint positions and joint stiffness vectors are not the same.");
               parseResult.successful = false;
               return parseResult;
           }
@@ -121,7 +151,7 @@ ParseResult parse(const std::vector<std::string> & in) {
 
       // Append to vector
       parseResult.keyFrames.push_back(KeyFrame{keyFrameTime, jointPositions, jointStiffnesses});
-
+      prevJointPositions=jointPositions;
 
       jointStiffnesses.stiffnesses.clear();
       jointStiffnesses.indexes.clear();

@@ -36,8 +36,7 @@ namespace naosoccer_pos_action {
 
 NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & options)
   : rclcpp::Node{"NaosoccerPosActionNode", options} {
-  this->declare_parameter<std::string>("file", getDefaultFullFilePath());
-
+    
   pub_joint_positions = create_publisher<nao_lola_command_msgs::msg::JointPositions>(
                           "effectors/joint_positions", 1);
   pub_joint_stiffnesses = create_publisher<nao_lola_command_msgs::msg::JointStiffnesses>(
@@ -59,22 +58,6 @@ NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & optio
                      std::bind(&NaosoccerPosActionNode::handleCancel, this, std::placeholders::_1),
                      std::bind(&NaosoccerPosActionNode::handleAccepted, this, std::placeholders::_1));
 
-  std::string filePath;
-  this->get_parameter("file", filePath);
-
-  std::ifstream ifstream(filePath);
-  if (ifstream.is_open()) {
-    RCLCPP_DEBUG(this->get_logger(), ("Pos file succesfully loaded from " + filePath).c_str());
-    file_successfully_read_ = true;
-    auto lines = readLines(ifstream); // string vector
-    auto parseResult = parser::parse(lines);
-    file_successfully_read_ = parseResult.successful;
-    key_frames_ = parseResult.keyFrames;
-  } else {
-    RCLCPP_ERROR(this->get_logger(), "Couldn't open file");
-    file_successfully_read_ = false;
-  }
-
   RCLCPP_INFO(this->get_logger(), "NaosoccerPosActionServer initialized");
 }
 
@@ -93,17 +76,6 @@ void NaosoccerPosActionNode::readPosFile(std::string & filePath) {
     RCLCPP_ERROR(this->get_logger(), "Couldn't open file");
     file_successfully_read_ = false;
   }
-}
-
-std::string NaosoccerPosActionNode::getDefaultFullFilePath() {
-  std::string file = "pos/initial.pos";
-  std::string package_share_directory = ament_index_cpp::get_package_share_directory(
-                                          "naosoccer_pos_action");
-
-  fs::path dir_path(package_share_directory);
-  fs::path file_path(file);
-  fs::path full_path = dir_path / file_path;
-  return full_path.string();
 }
 
 std::string NaosoccerPosActionNode::getFullFilePath(std::string & filename) {
@@ -129,13 +101,14 @@ std::vector<std::string> NaosoccerPosActionNode::readLines(std::ifstream & ifstr
   return ret;
 }
 
-template<class T> int NaosoccerPosActionNode::findFirst(T arr[], T element) {
-  int length = sizeof(arr) / sizeof(arr[0]);
-  for (int i = 0; i < length; i++) {
-    if (arr[i] == element)
-      return i;
-  }
-  return -1;
+float NaosoccerPosActionNode::findElem( const std::vector<uint8_t> & indexes , const std::vector<float> & data,  uint8_t joint) {
+
+    for (uint8_t a = 0; a < indexes.size() ; a++) {
+      if (indexes.at(a) == joint) {
+        return data.at(a);
+      }
+    }
+    return NAN;
 }
 
 void NaosoccerPosActionNode::calculateEffectorJoints(
@@ -163,8 +136,6 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
       std::make_unique<KeyFrame>(0, command, nao_lola_command_msgs::msg::JointStiffnesses{});
   }
 
-  RCLCPP_INFO(this->get_logger(), ("time_ms is: " + std::to_string(time_ms)).c_str());
-
   const auto & previousKeyFrame = findPreviousKeyFrame(time_ms);
   const auto & nextKeyFrame = findNextKeyFrame(time_ms);
 
@@ -174,7 +145,7 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
     }
     firstTickSinceActionStarted_ = false;
 
-    RCLCPP_INFO(this->get_logger(), "first tick false");
+    RCLCPP_DEBUG(this->get_logger(), "first tick false");
     /*std::string s1="";
     for (unsigned c = 0; c < selected_joints_.size(); c++) {
         s1.append( std::to_string(selected_joints_.at(c))+", " );
@@ -202,38 +173,27 @@ void NaosoccerPosActionNode::calculateEffectorJoints(
   nao_lola_command_msgs::msg::JointPositions effector_joints;
   nao_lola_command_msgs::msg::JointStiffnesses effector_joints_stiff;
 
-  bool flag;
-  float next=NAN, previous=NAN;
+  float nextPos=NAN, previousPos=NAN, nextStiff=NAN;
+
   for (uint8_t i : selected_joints_) {
 
-    flag = false;
-    uint8_t a;
-    for (a = 0; a < nextKeyFrame.positions.indexes.size() && !flag; a++) {
-      if (nextKeyFrame.positions.indexes.at(a) == i) {
-        next = nextKeyFrame.positions.positions.at(a);
-        flag = true;
-      }
-    }
-    // TODO raise exception if not found
+    nextPos = findElem( nextKeyFrame.positions.indexes, nextKeyFrame.positions.positions, i );
+    nextStiff = findElem( nextKeyFrame.stiffnesses.indexes, nextKeyFrame.stiffnesses.stiffnesses, i );
+    previousPos = findElem( previousKeyFrame.positions.indexes, previousKeyFrame.positions.positions, i );
 
-    flag = false;
-    for (a = 0; a < previousKeyFrame.positions.indexes.size() && !flag; a++) {
-      if (previousKeyFrame.positions.indexes.at(a) == i) {
-        previous = previousKeyFrame.positions.positions.at(a);
-        flag = true;
-      }
-    }
 
     effector_joints.indexes.push_back(i);
-    effector_joints.positions.push_back(previous * alpha + next * beta);
+    effector_joints.positions.push_back(previousPos * alpha + nextPos * beta);
     effector_joints_stiff.indexes.push_back(i);
-    effector_joints_stiff.stiffnesses.push_back( 1.0f );
-    next=NAN, previous=NAN;
+    effector_joints_stiff.stiffnesses.push_back( nextStiff );
+    
+    nextPos=NAN, previousPos=NAN, nextStiff=NAN;
+
   }
 
   pub_joint_positions->publish(effector_joints);
   pub_joint_stiffnesses->publish(effector_joints_stiff);
-  RCLCPP_INFO(this->get_logger(), "published to lola");
+  RCLCPP_DEBUG(this->get_logger(), "published to nao_lola topic");
 }
 const KeyFrame & NaosoccerPosActionNode::findPreviousKeyFrame(int time_ms) {
   for (auto it = key_frames_.rbegin(); it != key_frames_.rend(); ++it) {
