@@ -1,0 +1,8 @@
+legs swing
+
+  HY    HP    LSP   LSR   LEY   LER    LWY   LHYP  LHR   LHP   LKP   LAP   LAR   RHR   RHP   RKP   RAP   RAR    RSP   RSR   REY   RER   RWY   LH    RH    DUR
+! -     -      -     -     -     -      -     0     0     0     0     0     0     0    -10    +20   -10     0      -     -     -     -     -     -     -   4000
+! -     -      -     -     -     -      -     0     0     0     0     0     0     0    -10    +20   -10     0      -     -     -     -     -     -     -   4000
+! -     -      -     -     -     -      -     0     0   -10    +20   -10     0     0     0     0     0     0      -     -     -     -     -     -     -   4000 
+! -     -      -     -     -     -      -     0     0   -10    +20   -10     0     0     0     0     0     0      -     -     -     -     -     -     -   2000
+! -     -      -     -     -     -      -     0     0     0     0     0     0     0     0     0     0     0      -     -     -     -     -     -     -   2000
