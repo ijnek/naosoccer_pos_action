@@ -1,0 +1,14 @@
+Positions taken from LoLAEffector.cpp
+
+  HY    HP    LSP   LSR   LEY   LER   LWY   LHYP  LHR   LHP   LKP   LAP   LAR   RHR   RHP   RKP   RAP   RAR   RSP   RSR   REY   RER   RWY   LH    RH    DUR
+crouch with arms forward, so they dont get caught on the body
+$ 0     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     
+! 0     0     70    25    -92   -61   54    0     0     -50   125   -70   0     0     -50   125   -70   0     70    -25   92    61    -54   0     0     2000
+
+sit fully, place hands on knees to avoid robot falling forward and face planting
+$ 0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2   0.2
+! 0     0     72    2     -33   -47   55    0     0     -50   125   -70   0     0     -50   125   -70   0     72    -2    33    47    -55   0     0     1000
+
+go completely limp
+$ 0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     
+! 0     0     72    2     -33   -47   55    0     0     -50   125   -70   0     0     -50   125   -70   0     72    -2    33    47    -55   0     0     50

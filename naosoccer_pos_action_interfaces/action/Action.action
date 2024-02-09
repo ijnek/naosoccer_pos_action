@@ -1,0 +1,7 @@
+# Request
+string action_name
+---
+# Result
+bool success
+---
+# Feedback
