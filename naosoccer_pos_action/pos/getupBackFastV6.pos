@@ -1,0 +1,27 @@
+  HY    HP    LSP   LSR   LEY   LER   LWY   LHYP  LHR   LHP   LKP   LAP   LAR   RHR   RHP   RKP   RAP   RAR   RSP   RSR   REY   RER   RWY   LH    RH    DUR
+init position lay dead
+! 0     0     90    30    0     0     0     0     0     0     0     0     0     0     0     0     0     0     90    -30   0     0     0     0     0     200
+
+init position stiffen
+! 0     0     90    30    0     0     0     0     0     0     0     0     0     0     0     0     0     0     90    -30   0     0     0     0     0     100
+
+lay down, prepare to put arms under back
+! 0     29    122   34    1     -87   -67   0     3     24    70    22    0     -4    26    63    26    0     123   -30   -2    87    65    0     0     150
+
+put arms behind back
+! 0     29    121   19    -6    -87   -53   5     13    13    69    26    0     -13   13    69    26    0     121   -19   6     87    53    4     0     250
+
+push body up
+! 0     -48   122   13    -3    -82   -14   -16   26    -47   21    26    0     -26   -47   21    26    0     122   -13   3     82    14    4     0     490
+
+sit up with feet open
+! 0     29    114   -19   5     -1    -83   -67   31    -89   101   35    2     -31   -89   101   35    -2    114   19    -5    1     83    0     0     230
+
+getup onto feet. lean forwards and a bit on left foot
+! -8    29    99    37    -9    -2    -29   -50   41    -92   122   -12   -24   -3    -62   116   -19   13    106   0     3     2     70    0     0     330
+
+crouch
+! 0     29    106   10    0      0    0     0     0     -51   121   -68   0     0     -51   122   -69   5     71    -1    34    47    -53   0     0     600
+
+stand up. this is from printing out the joints in Walk2014Generator. It's a bit different to crouch.
+! 0     29    106   10    0      0    0     0     0     -23   46    -23   0     0     -23   46    -23   0     91    -10   90    8     90    0     0     400

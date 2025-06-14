@@ -1,0 +1,16 @@
+  HY    HP    LSP   LSR   LEY   LER   LWY   LHYP  LHR   LHP   LKP   LAP   LAR   RHR   RHP   RKP   RAP   RAR   RSP   RSR   REY   RER   RWY   LH    RH    DUR
+
+moves arms out to front and bend back, to avoid hitting the head as much as possible. Quickly move the headyaw back to 0 so we don't hit the side of our head on the ground
+$ 1.0   1.0   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.5   0.5   0.5   0.5   0.5   0.5   0.5   0.5   0.5   0.8   0.8   0.8   0.8   0.8   0.8   0.8
+! 0     -38.5 90    16    -90   -80   0     0     0     28    80    -58   0     -0    28    80    -58   0     90    -16    90   80    0     0     0     100
+
+same as previous line, but reduce stiffness in arms so that we can absorb the shock
+$ 1.0   1.0   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0     0
+! 0    -38.5  90    16    -90   -80   0     0     0     28    80    -58   0     -0    28    80    -58   0     90    -16    90   80    0     0     0     500
+
+same as previous line, but set stiffnes to 0 so that we can transition to the next line smoothly without the joints getting caught
+$ 0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0     0
+! 0     -20   120   40    -90   -5    2     -4    0     10    43    0     0     0     10    43    0     0     120   -40   90    5     -2    1     0     500
+
+go to lying position, so we can ensure that the angley of the robot reaches the getup threshold
+! 0     0     90    10    0     0     0     0     0     0     0     30    0     0     0     0     30    0     90    -10   0     0     0     0     0     500

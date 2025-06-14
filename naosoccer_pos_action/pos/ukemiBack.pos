@@ -1,0 +1,12 @@
+  HY    HP    LSP   LSR   LEY   LER   LWY   LHYP  LHR   LHP   LKP   LAP   LAR   RHR   RHP   RKP   RAP   RAR   RSP   RSR   REY   RER   RWY   LH    RH    DUR
+
+tuck and roll backwards, tuck head in as much possible to not hit it on the ground. Quickly move the headyaw back to 0 so we don't hit the side of our head on the ground
+$ 1.0   1.0   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8   0.8
+! 0     28    115   16    -90   -70    0    0      0    -92   120   -68   0     -0    -92   120   -68   0     115   -16   90    70    0     0     0     200
+
+same as previous line, but reduce stiffness so that we don't force joints when hitting the ground
+$ 1.0   1.0   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4   0.4
+! 0     28    115   16    -90   -70    0    0      0    -92   120   -68   0     -0    -92   120   -68   0     115   -16   90    70    0     0     0     300
+
+go to lying position, so we can ensure that the angley of the robot reaches the getup threshold
+! 0     28    90    30    0     0     0     0     0     0     0     0     0     0     0     0     0     0     90    -30   0     0     0     0     0     400

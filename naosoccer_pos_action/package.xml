@@ -10,12 +10,13 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
   <depend>rclcpp_components</depend>
   <depend>boost</depend>
   <depend>nao_lola_sensor_msgs</depend>
   <depend>nao_lola_command_msgs</depend>
-  <depend>std_msgs</depend>
   <depend>ament_index_cpp</depend>
+  <depend>naosoccer_pos_action_interfaces</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
